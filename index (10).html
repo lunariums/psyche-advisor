@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psyche — Psikoloji Danışmanı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --bg-2: #141416;
+    --bg-3: #1a1a1d;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #f0ede8;
+    --text-2: #8b8780;
+    --text-3: #5a5754;
+    --accent: #c9a96e;
+    --accent-dim: rgba(201,169,110,0.12);
+    --accent-hover: #d4b87f;
+    --danger: #e05555;
+    --success: #5aad7a;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── LANDING ── */
+  #landing {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,169,110,0.08) 0%, transparent 70%);
+  }
+
+  .logo-mark {
+    width: 64px; height: 64px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 2rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+
+  #landing h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  #landing h1 em { color: var(--accent); font-style: normal; }
+
+  .tagline {
+    font-size: 1rem;
+    color: var(--text-2);
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .minds-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    max-width: 640px;
+    margin: 0 auto 3rem;
+  }
+
+  .mind-tag {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-3);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 3px 10px;
+    letter-spacing: 0.02em;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .mind-tag:hover { color: var(--accent); border-color: var(--accent); cursor: default; }
+
+  .cta-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0d0d0f;
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .btn-google {
+    background: var(--bg-3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+  }
+  .btn-google:hover { border-color: var(--border-hover); background: var(--bg-2); }
+  .btn-google svg { width: 18px; height: 18px; }
+
+  /* ── SETUP MODAL ── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .modal p.sub { font-size: 13px; color: var(--text-2); margin-bottom: 1.75rem; line-height: 1.5; }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 1.25rem 0;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  input[type=text], input[type=email], input[type=password], select, textarea {
+    width: 100%;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--text-3); }
+
+  .tab-bar {
+    display: flex;
+    background: var(--bg-3);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 1.5rem;
+    gap: 2px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text-2);
+    transition: all 0.18s;
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+  }
+  .tab.active { background: var(--bg-2); color: var(--text); }
+
+  .error-msg {
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 0.5rem;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* ── SETUP SCREEN ── */
+  #setup {
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .setup-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .setup-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .ai-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 1.25rem 0;
+  }
+
+  .ai-card {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .ai-card:hover { border-color: var(--border-hover); }
+  .ai-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .ai-card .ai-name { font-size: 13px; font-weight: 500; margin-top: 6px; }
+  .ai-card .ai-logo { font-size: 22px; }
+
+  .hint { font-size: 12px; color: var(--text-3); margin-top: 4px; line-height: 1.4; }
+  .hint a { color: var(--accent); text-decoration: none; }
+  .hint a:hover { text-decoration: underline; }
+
+  /* ── APP SCREEN ── */
+  #app {
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 12px;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+
+  .topbar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+
+  .topbar-sep { width: 1px; height: 20px; background: var(--border); }
+
+  .model-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .model-pill:hover { border-color: var(--border-hover); color: var(--text); }
+  .model-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .avatar-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-width: 180px;
+    z-index: 50;
+    overflow: hidden;
+    display: none;
+  }
+  .dropdown.open { display: block; }
+
+  .dropdown-item {
+    padding: 10px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-2);
+    transition: background 0.15s, color 0.15s;
+  }
+  .dropdown-item:hover { background: var(--bg-3); color: var(--text); }
+  .dropdown-item.danger:hover { color: var(--danger); }
+  .dropdown-item small { display: block; font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+  /* Chat area */
+  .chat-wrap {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    scroll-behavior: smooth;
+  }
+
+  .chat-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 60vh;
+    padding: 2rem;
+    gap: 1rem;
+  }
+  .empty-state .icon { font-size: 2.5rem; opacity: 0.3; margin-bottom: 0.5rem; }
+  .empty-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: var(--text);
+  }
+  .empty-state p { font-size: 14px; color: var(--text-2); max-width: 380px; line-height: 1.6; }
+
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  .suggestion-chip {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: left;
+    max-width: 280px;
+  }
+  .suggestion-chip:hover { border-color: var(--accent); color: var(--text); background: var(--accent-dim); }
+
+  /* Messages */
+  .msg {
+    display: flex;
+    gap: 14px;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .msg.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .msg.user .msg-avatar { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); }
+  .msg.ai .msg-avatar { background: var(--bg-3); border: 1px solid var(--border); color: var(--text-2); font-size: 13px; }
+
+  .msg-body {
+    max-width: calc(100% - 56px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .msg.user .msg-body { align-items: flex-end; }
+
+  .msg-bubble {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+
+  .msg.user .msg-bubble {
+    background: var(--accent);
+    color: #0d0d0f;
+    border-radius: var(--radius) var(--radius) 4px var(--radius);
+  }
+
+  .msg.ai .msg-bubble {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px var(--radius) var(--radius) var(--radius);
+  }
+
+  .msg-bubble h3, .msg-bubble h4 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    margin: 1rem 0 0.4rem;
+    font-size: 1.05em;
+    color: var(--accent);
+  }
+  .msg-bubble h3:first-child, .msg-bubble h4:first-child { margin-top: 0; }
+  .msg-bubble p + p { margin-top: 0.75em; }
+  .msg-bubble strong { font-weight: 500; color: var(--accent); }
+  .msg-bubble em { font-style: italic; color: var(--text-2); }
+  .msg-bubble ul, .msg-bubble ol { margin: 0.5em 0 0.5em 1.4em; }
+  .msg-bubble li { margin-bottom: 0.3em; }
+  .msg-bubble code {
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 13px;
+    font-family: monospace;
+  }
+
+  .msg-meta { font-size: 11px; color: var(--text-3); }
+
+  /* Typing indicator */
+  .typing-bubble {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 14px 18px;
+  }
+  .typing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-3);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{ transform:translateY(0); } 30%{ transform:translateY(-5px); } }
+
+  /* Input bar */
+  .input-bar {
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.25rem 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .input-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .input-box {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    padding: 14px 52px 14px 16px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+    max-height: 160px;
+    min-height: 52px;
+  }
+  .input-box:focus { border-color: rgba(201,169,110,0.4); }
+  .input-box::placeholder { color: var(--text-3); }
+
+  .send-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+  }
+  .send-btn:hover { background: var(--accent-hover); }
+  .send-btn:disabled { opacity: 0.3; cursor: default; }
+  .send-btn svg { width: 16px; height: 16px; fill: #0d0d0f; }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  /* Model switcher in chat */
+  .model-switch {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .model-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .model-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .model-btn:hover:not(.active) { border-color: var(--border-hover); color: var(--text-2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 10px; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .ai-options { grid-template-columns: repeat(3,1fr); }
+    .topbar { padding: 12px 14px; }
+    .chat-inner { padding: 1.25rem 1rem; }
+    .minds-strip { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LANDING ── -->
+<div id="landing" class="screen active">
+  <div class="logo-mark">Ψ</div>
+  <h1>15 büyük zihin,<br><em>tek bir danışman</em></h1>
+  <p class="tagline">
+    Freud'dan Beck'e, Yalom'dan Gottman'a — psikolojinin en etkili isimlerinin
+    bilgeliğiyle desteklenen, sizi anlayan bir danışman.
+  </p>
+  <div class="minds-strip">
+    <span class="mind-tag">Sigmund Freud</span>
+    <span class="mind-tag">Carl Jung</span>
+    <span class="mind-tag">Carl Rogers</span>
+    <span class="mind-tag">B.F. Skinner</span>
+    <span class="mind-tag">Aaron T. Beck</span>
+    <span class="mind-tag">John Gottman</span>
+    <span class="mind-tag">Esther Perel</span>
+    <span class="mind-tag">Gary Chapman</span>
+    <span class="mind-tag">Sue Johnson</span>
+    <span class="mind-tag">Harville Hendrix</span>
+    <span class="mind-tag">Irvin D. Yalom</span>
+    <span class="mind-tag">Jordan Peterson</span>
+    <span class="mind-tag">Sam Vaknin</span>
+    <span class="mind-tag">Gabor Maté</span>
+    <span class="mind-tag">Bessel van der Kolk</span>
+  </div>
+  <div class="cta-group">
+    <button class="btn btn-primary" onclick="openAuthModal('login')">Giriş Yap</button>
+    <button class="btn btn-ghost" onclick="openAuthModal('register')">Hesap Oluştur</button>
+  </div>
+  <p style="margin-top:1.5rem; font-size:12px; color:var(--text-3);">
+    Google ile giriş de desteklenmektedir
+  </p>
+</div>
+
+<!-- ── AUTH MODAL ── -->
+<div class="modal-backdrop" id="authModal" onclick="closeAuthIfBackdrop(event)">
+  <div class="modal">
+    <div class="tab-bar">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button>
+      <button class="tab" id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
+    </div>
+
+    <button class="btn btn-google" onclick="googleSignIn()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Google ile Devam Et
+    </button>
+
+    <div class="divider">veya e-posta ile</div>
+
+    <div id="formLogin">
+      <div class="form-group">
+        <label>E-Posta</label>
+        <input type="email" id="loginEmail" placeholder="ornek@mail.com" onkeydown="if(event.key==='Enter')emailSignIn()">
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')emailSignIn()">
+      </div>
+      <div id="loginError" class="error-msg"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="emailSignIn()">Giriş Yap</button>
+    </div>
+
+    <div id="formRegister" style="display:none">
+      <div class="form-group">
+        <label>Ad Soyad</label>
+        <input type="text" id="regName" placeholder="Adınız">
+      </div>
+      <div class="form-group">
+        <label>E-Posta</label>
+        <input type="email" id="regEmail" placeholder="ornek@mail.com">
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" id="regPass" placeholder="En az 6 karakter" onkeydown="if(event.key==='Enter')emailRegister()">
+      </div>
+      <div id="registerError" class="error-msg"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="emailRegister()">Hesap Oluştur</button>
+    </div>
+
+    <p style="font-size:11px;color:var(--text-3);margin-top:1.25rem;text-align:center;line-height:1.5">
+      Firebase kurulumu için <a href="#" style="color:var(--accent)" onclick="showFirebaseGuide()">kurulum rehberi</a>'ni inceleyin.
+    </p>
+  </div>
+</div>
+
+<!-- ── SETUP SCREEN (API Key) ── -->
+<div id="setup" class="screen">
+  <div class="setup-card">
+    <h2>Yapay Zeka Seçin</h2>
+    <p class="sub" style="color:var(--text-2);font-size:13px;margin-bottom:1.5rem;line-height:1.5">
+      Hangi AI motorunu kullanmak istediğinizi seçin ve API anahtarınızı girin.
+      Anahtarlar yalnızca tarayıcınızda saklanır, sunucuya gönderilmez.
+    </p>
+
+    <div class="ai-options">
+      <div class="ai-card selected" id="card-claude" onclick="selectAI('claude')">
+        <div class="ai-logo">🤖</div>
+        <div class="ai-name">Claude</div>
+      </div>
+      <div class="ai-card" id="card-openai" onclick="selectAI('openai')">
+        <div class="ai-logo">⬡</div>
+        <div class="ai-name">ChatGPT</div>
+      </div>
+      <div class="ai-card" id="card-gemini" onclick="selectAI('gemini')">
+        <div class="ai-logo">✦</div>
+        <div class="ai-name">Gemini</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label id="apiLabel">Anthropic API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
+      <p class="hint" id="apiHint">
+        Anahtarınızı <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> adresinden alabilirsiniz.
+      </p>
+    </div>
+
+    <div id="setupError" class="error-msg"></div>
+
+    <div style="display:flex;gap:10px;margin-top:1.5rem">
+      <button class="btn btn-ghost" onclick="skipSetup()" style="flex:1;justify-content:center">Demoyu Dene</button>
+      <button class="btn btn-primary" onclick="saveSetup()" style="flex:1;justify-content:center">Başla →</button>
+    </div>
+
+    <p style="font-size:11px;color:var(--text-3);margin-top:1rem;text-align:center;line-height:1.5">
+      API key olmadan demo mod'da birkaç örnek cevap alabilirsiniz.
+    </p>
+  </div>
+</div>
+
+<!-- ── APP SCREEN ── -->
+<div id="app" class="screen">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">Ψ Psyche</span>
+      <div class="topbar-sep"></div>
+      <div class="model-pill" onclick="openModelPicker()">
+        <span class="model-dot"></span>
+        <span id="activeModeLabel">Claude</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:.5"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" style="font-size:13px;padding:7px 14px" onclick="clearChat()">Temizle</button>
+      <div class="avatar-btn" id="avatarBtn" onclick="toggleDropdown()">
+        <span id="avatarInitials">?</span>
+        <div class="dropdown" id="userDropdown">
+          <div class="dropdown-item" style="pointer-events:none">
+            <span id="dropdownName" style="font-weight:500;color:var(--text)">—</span>
+            <small id="dropdownEmail">—</small>
+          </div>
+          <div class="dropdown-item" onclick="openModelPicker()">⚙ Model Ayarları</div>
+          <div class="dropdown-item danger" onclick="signOut()">Çıkış Yap</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-wrap" id="chatWrap">
+    <div class="chat-inner" id="chatInner">
+      <!-- empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="icon">Ψ</div>
+        <h3>Merhaba, nasıl yardımcı olabilirim?</h3>
+        <p>Psikoloji, ilişkiler, travma, bilinçdışı, duygusal örüntüler — her konuda konuşabilirsiniz.</p>
+        <div class="suggestions">
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">Sürekli eleştiriden bunaldım, bu beni neden bu kadar etkiliyor?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">Narsistik bir kişiyle ilişkim var, nasıl başa çıkabilirim?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">Çocukluk travmam yetişkinlikte nasıl kendini gösteriyor?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">Partnerimi seviyorum ama neden bu kadar çabuk kavga ediyoruz?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">Anlam bulamıyorum, hayatımın amacı ne olabilir?</button>
+          <button class="suggestion-chip" onclick="sendSuggestion(this)">Kaygı atakları yaşıyorum, bunun kökenine nasıl inebilirim?</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-bar">
+    <div class="input-inner">
+      <textarea class="input-box" id="msgInput" placeholder="Düşüncenizi yazın..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 16 16"><path d="M2 8L14 2L10 8L14 14L2 8Z"/></svg>
+      </button>
+    </div>
+    <div class="input-footer">
+      <div class="model-switch">
+        <span style="color:var(--text-3)">Motor:</span>
+        <button class="model-btn active" id="mb-claude" onclick="switchModel('claude')">Claude</button>
+        <button class="model-btn" id="mb-openai" onclick="switchModel('openai')">ChatGPT</button>
+        <button class="model-btn" id="mb-gemini" onclick="switchModel('gemini')">Gemini</button>
+      </div>
+      <span>Enter ile gönder · Shift+Enter ile satır</span>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase Guide Modal -->
+<div class="modal-backdrop" id="firebaseGuideModal" onclick="if(event.target===this)this.classList.remove('open')" style="z-index:200">
+  <div class="modal" style="max-width:560px">
+    <h2 style="font-family:'Playfair Display',serif;font-weight:400;margin-bottom:1rem">Firebase Kurulumu</h2>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:1rem">
+      Google ile giriş için Firebase Authentication kurmanız gerekiyor:
+    </p>
+    <ol style="font-size:13px;color:var(--text-2);line-height:2;padding-left:1.25rem">
+      <li><a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">console.firebase.google.com</a> adresine gidin</li>
+      <li>Yeni proje oluşturun</li>
+      <li>Authentication → Sign-in method → Google'ı etkinleştirin</li>
+      <li>Project Settings → Firebase SDK snippet → Config'i kopyalayın</li>
+      <li>Bu HTML dosyasının sonundaki <code style="color:var(--accent)">firebaseConfig</code> nesnesini doldurun</li>
+      <li>E-posta/şifre girişi için Authentication'dan Email/Password'ü etkinleştirin</li>
+    </ol>
+    <p style="font-size:12px;color:var(--text-3);margin-top:1rem;line-height:1.5">
+      Firebase kurulmadan demo mod çalışmaya devam eder — API key girerseniz gerçek yanıtlar alırsınız.
+    </p>
+    <button class="btn btn-ghost" style="margin-top:1.25rem;width:100%;justify-content:center" onclick="document.getElementById('firebaseGuideModal').classList.remove('open')">Kapat</button>
+  </div>
+</div>
+
+<!-- Model Picker Modal -->
+<div class="modal-backdrop" id="modelPickerModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="max-width:420px">
+    <h2 style="font-family:'Playfair Display',serif;font-weight:400;margin-bottom:0.4rem">API Ayarları</h2>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:1.5rem;line-height:1.5">API anahtarlarınızı güncelleyin veya aktif modeli değiştirin.</p>
+
+    <div class="form-group">
+      <label>Anthropic (Claude) API Key</label>
+      <input type="password" id="settingsClaudeKey" placeholder="sk-ant-...">
+    </div>
+    <div class="form-group">
+      <label>OpenAI (ChatGPT) API Key</label>
+      <input type="password" id="settingsOpenAIKey" placeholder="sk-...">
+    </div>
+    <div class="form-group">
+      <label>Google (Gemini) API Key</label>
+      <input type="password" id="settingsGeminiKey" placeholder="AIza...">
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:1.25rem">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="document.getElementById('modelPickerModal').classList.remove('open')">İptal</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveSettings()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // ── CONFIGURE FIREBASE ──────────────────────────────────────────────────────
+  // Kendi Firebase projenizin bilgilerini buraya yapıştırın:
+  const firebaseConfig = {
+    apiKey: "",            // ← buraya
+    authDomain: "",        // ← buraya
+    projectId: "",         // ← buraya
+    storageBucket: "",     // ← buraya
+    messagingSenderId: "", // ← buraya
+    appId: ""              // ← buraya
+  };
+  // ────────────────────────────────────────────────────────────────────────────
+
+  let app, auth, provider;
+  const FIREBASE_CONFIGURED = !!firebaseConfig.apiKey;
+
+  if (FIREBASE_CONFIGURED) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    provider = new GoogleAuthProvider();
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        window._user = { name: user.displayName || user.email.split('@')[0], email: user.email };
+        goToApp();
+      }
+    });
+  }
+
+  window.googleSignIn = async () => {
+    if (!FIREBASE_CONFIGURED) { demoLogin(); return; }
+    try {
+      await signInWithPopup(auth, provider);
+    } catch(e) { showAuthError(e.message); }
+  };
+
+  window.emailSignIn = async () => {
+    if (!FIREBASE_CONFIGURED) { demoLogin(); return; }
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass  = document.getElementById('loginPass').value;
+    if (!email || !pass) { showAuthError('Lütfen tüm alanları doldurun.'); return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch(e) {
+      const msgs = { 'auth/wrong-password':'Şifre hatalı.', 'auth/user-not-found':'Kullanıcı bulunamadı.', 'auth/invalid-email':'Geçersiz e-posta.' };
+      showAuthError(msgs[e.code] || e.message);
+    }
+  };
+
+  window.emailRegister = async () => {
+    if (!FIREBASE_CONFIGURED) { demoLogin(); return; }
+    const name  = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass  = document.getElementById('regPass').value;
+    if (!name || !email || !pass) { showAuthError('Lütfen tüm alanları doldurun.', true); return; }
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+    } catch(e) {
+      const msgs = { 'auth/email-already-in-use':'Bu e-posta zaten kullanımda.', 'auth/weak-password':'Şifre en az 6 karakter olmalı.' };
+      showAuthError(msgs[e.code] || e.message, true);
+    }
+  };
+
+  window.signOut = async () => {
+    if (FIREBASE_CONFIGURED) await fbSignOut(auth);
+    window._user = null;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('landing').classList.add('active');
+    closeDropdown();
+  };
+</script>
+
+<script>
+// ── STATE ──
+let currentModel = localStorage.getItem('psyche_model') || 'claude';
+let apiKeys = {
+  claude: localStorage.getItem('psyche_key_claude') || '',
+  openai: localStorage.getItem('psyche_key_openai') || '',
+  gemini: localStorage.getItem('psyche_key_gemini') || '',
+};
+let chatHistory = [];
+let isLoading = false;
+let demoUsed = 0;
+const DEMO_LIMIT = 3;
+
+// ── SYSTEM PROMPT ──
+const SYSTEM_PROMPT = `Sen, psikoloji ve terapinin en etkili 15 isminin bilgeliğini ve yetkinliklerini bütünleşik olarak taşıyan bir danışmansın. Bu isimler şunlardır:
+
+**Sigmund Freud** — Psikanaliz, bilinçdışı dinamikler, savunma mekanizmaları, erken çocukluk deneyimleri
+**Carl Jung** — Kolektif bilinçdışı, arketipler, gölge çalışması, bireyleşme süreci
+**Carl Rogers** — İnsancıl psikoloji, koşulsuz kabul, empatik dinleme, öz-gerçekleşme
+**B.F. Skinner** — Davranışçılık, pekiştirme döngüleri, alışkanlık oluşumu, koşullanma
+**Aaron T. Beck** — Bilişsel terapi, otomatik düşünceler, bilişsel çarpıtmalar, şema çalışması
+**John Gottman** — İlişki dinamikleri, "Dört Atlı" (eleştiri, küçümseme, savunma, duvar örme), güven inşası
+**Esther Perel** — Arzu, yakınlık paradoksu, flört, modern ilişkilerin karmaşıklığı
+**Gary Chapman** — Beş Aşk Dili, duygusal ihtiyaçlar, ilişkilerde iletişim
+**Sue Johnson** — Duygusal Odaklı Terapi (EFT), bağlanma teorisi, çift terapisi
+**Harville Hendrix** — Imago ilişki terapisi, bilinçdışı eş seçimi, "kayıp çocuk" yaraları
+**Irvin D. Yalom** — Varoluşsal psikanaliz, ölüm farkındalığı, anlam arayışı, grup terapisi
+**Jordan Peterson** — Anlam ve sorumluluk, arketipsel hikayeler, kişisel düzen, değerler
+**Sam Vaknin** — Narsisizm, narsisistik örüntüler, kötüye kullanım dinamikleri, patolojik bağlanma
+**Gabor Maté** — Travma ve beden, bağımlılık kökleri, otoimmün bağlantısı, şefkatli sorgulama
+**Bessel van der Kolk** — Travmanın bedende depolanması, TSSB, somatik yaklaşımlar, "Beden Skoru Tutar"
+
+**Temel ilkeler:**
+- Her soruya bu 15 zihnin bütünleşik perspektifinden, hangisi en uygunsa onu ön plana çıkararak cevap ver
+- Gerçekçi, empatik, doğrudan ve somut ol — vakit kaybetmeden asıl meseleye in
+- Teori ve pratiği dengele; hem kavramsal açıkla hem de ne yapılabileceğini göster
+- Gerektiğinde hangi ismin bakış açısını kullandığını belirt
+- Türkçe konuş; cevaplarını akıcı, samimi ve erişilebilir bir dille yaz
+- Patoloji etiketleme; insan deneyimini anlama odaklı ol
+- Kritik durumlarda (intihar, şiddet vb.) mutlaka profesyonel yardım al mesajı ver`;
+
+// ── NAVIGATION ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function demoLogin() {
+  window._user = window._user || { name: 'Misafir', email: 'demo@psyche.app' };
+  document.getElementById('authModal').classList.remove('open');
+  showScreen('setup');
+}
+
+function goToApp() {
+  document.getElementById('authModal').classList.remove('open');
+  const user = window._user;
+  if (user) {
+    const initials = user.name ? user.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '?';
+    document.getElementById('avatarInitials').textContent = initials;
+    document.getElementById('dropdownName').textContent = user.name || 'Kullanıcı';
+    document.getElementById('dropdownEmail').textContent = user.email || '';
+  }
+  updateModelUI();
+  showScreen('app');
+}
+
+// ── AUTH MODAL ──
+function openAuthModal(tab) {
+  document.getElementById('authModal').classList.add('open');
+  switchTab(tab);
+}
+
+function closeAuthIfBackdrop(e) {
+  if (e.target === document.getElementById('authModal'))
+    document.getElementById('authModal').classList.remove('open');
+}
+
+function switchTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabRegister').classList.toggle('active', tab==='register');
+  document.getElementById('formLogin').style.display = tab==='login' ? '' : 'none';
+  document.getElementById('formRegister').style.display = tab==='register' ? '' : 'none';
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('registerError').classList.remove('show');
+}
+
+function showAuthError(msg, isReg=false) {
+  const el = document.getElementById(isReg ? 'registerError' : 'loginError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function showFirebaseGuide() {
+  document.getElementById('firebaseGuideModal').classList.add('open');
+}
+
+// ── SETUP ──
+let selectedAI = 'claude';
+
+function selectAI(ai) {
+  selectedAI = ai;
+  document.querySelectorAll('.ai-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-' + ai).classList.add('selected');
+  const labels = { claude: ['Anthropic API Key','Anahtarı console.anthropic.com adresinden alın.','sk-ant-...'], openai: ['OpenAI API Key','Anahtarı platform.openai.com adresinden alın.','sk-...'], gemini: ['Google Gemini API Key','Anahtarı aistudio.google.com adresinden alın.','AIza...'] };
+  const [l, h, p] = labels[ai];
+  document.getElementById('apiLabel').textContent = l;
+  document.getElementById('apiHint').textContent = h;
+  document.getElementById('apiKeyInput').placeholder = p;
+  document.getElementById('apiKeyInput').value = apiKeys[ai] || '';
+}
+
+function saveSetup() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) { document.getElementById('setupError').textContent = 'API anahtarı boş bırakılamaz. Demo için "Demoyu Dene"yi kullanın.'; document.getElementById('setupError').classList.add('show'); return; }
+  apiKeys[selectedAI] = key;
+  localStorage.setItem('psyche_key_' + selectedAI, key);
+  currentModel = selectedAI;
+  localStorage.setItem('psyche_model', currentModel);
+  goToApp();
+}
+
+function skipSetup() {
+  goToApp();
+}
+
+// ── DROPDOWN ──
+function toggleDropdown() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+function closeDropdown() {
+  document.getElementById('userDropdown').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('avatarBtn')?.contains(e.target)) closeDropdown();
+});
+
+// ── MODEL ──
+function switchModel(m) {
+  currentModel = m;
+  localStorage.setItem('psyche_model', m);
+  updateModelUI();
+}
+
+function updateModelUI() {
+  const labels = { claude: 'Claude', openai: 'ChatGPT', gemini: 'Gemini' };
+  document.getElementById('activeModeLabel').textContent = labels[currentModel] || currentModel;
+  ['claude','openai','gemini'].forEach(m => {
+    const btn = document.getElementById('mb-' + m);
+    if (btn) btn.classList.toggle('active', m === currentModel);
+  });
+}
+
+function openModelPicker() {
+  closeDropdown();
+  document.getElementById('settingsClaudeKey').value = apiKeys.claude || '';
+  document.getElementById('settingsOpenAIKey').value = apiKeys.openai || '';
+  document.getElementById('settingsGeminiKey').value = apiKeys.gemini || '';
+  document.getElementById('modelPickerModal').classList.add('open');
+}
+
+function saveSettings() {
+  apiKeys.claude = document.getElementById('settingsClaudeKey').value.trim();
+  apiKeys.openai = document.getElementById('settingsOpenAIKey').value.trim();
+  apiKeys.gemini = document.getElementById('settingsGeminiKey').value.trim();
+  Object.entries(apiKeys).forEach(([k,v]) => { if(v) localStorage.setItem('psyche_key_'+k, v); });
+  document.getElementById('modelPickerModal').classList.remove('open');
+  updateModelUI();
+}
+
+// ── CHAT ──
+function clearChat() {
+  chatHistory = [];
+  const inner = document.getElementById('chatInner');
+  inner.innerHTML = `<div class="empty-state" id="emptyState">
+    <div class="icon">Ψ</div>
+    <h3>Merhaba, nasıl yardımcı olabilirim?</h3>
+    <p>Psikoloji, ilişkiler, travma, bilinçdışı, duygusal örüntüler — her konuda konuşabilirsiniz.</p>
+    <div class="suggestions">
+      <button class="suggestion-chip" onclick="sendSuggestion(this)">Sürekli eleştiriden bunaldım, bu beni neden bu kadar etkiliyor?</button>
+      <button class="suggestion-chip" onclick="sendSuggestion(this)">Narsistik bir kişiyle ilişkim var, nasıl başa çıkabilirim?</button>
+      <button class="suggestion-chip" onclick="sendSuggestion(this)">Çocukluk travmam yetişkinlikte nasıl kendini gösteriyor?</button>
+      <button class="suggestion-chip" onclick="sendSuggestion(this)">Partnerimi seviyorum ama neden bu kadar çabuk kavga ediyoruz?</button>
+      <button class="suggestion-chip" onclick="sendSuggestion(this)">Anlam bulamıyorum, hayatımın amacı ne olabilir?</button>
+      <button class="suggestion-chip" onclick="sendSuggestion(this)">Kaygı atakları yaşıyorum, bunun kökenine nasıl inebilirim?</button>
+    </div>
+  </div>`;
+}
+
+function sendSuggestion(el) {
+  document.getElementById('msgInput').value = el.textContent;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  // Remove empty state
+  const es = document.getElementById('emptyState');
+  if (es) es.remove();
+
+  input.value = '';
+  input.style.height = '';
+
+  appendMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  const typingEl = appendTyping();
+
+  try {
+    let reply;
+    if (!apiKeys[currentModel] && demoUsed >= DEMO_LIMIT) {
+      reply = `Demo limitinize ulaştınız. Devam etmek için lütfen API ayarlarından bir ${currentModel === 'claude' ? 'Anthropic' : currentModel === 'openai' ? 'OpenAI' : 'Google Gemini'} API anahtarı girin.`;
+    } else if (!apiKeys[currentModel]) {
+      reply = await demoResponse(text);
+      demoUsed++;
+    } else {
+      if (currentModel === 'claude') reply = await callClaude(text);
+      else if (currentModel === 'openai') reply = await callOpenAI(text);
+      else reply = await callGemini(text);
+    }
+    typingEl.remove();
+    appendMessage('ai', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(err) {
+    typingEl.remove();
+    appendMessage('ai', `⚠ Hata: ${err.message}`);
+  }
+
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('chatWrap').scrollTo({ top: 9999, behavior: 'smooth' });
+}
+
+function appendMessage(role, text) {
+  const inner = document.getElementById('chatInner');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const avatarText = role === 'user'
+    ? (window._user?.name?.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'S')
+    : 'Ψ';
+
+  div.innerHTML = `
+    <div class="msg-avatar">${avatarText}</div>
+    <div class="msg-body">
+      <div class="msg-bubble">${role === 'ai' ? formatMessage(text) : escapeHtml(text)}</div>
+      <span class="msg-meta">${new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`;
+
+  inner.appendChild(div);
+  document.getElementById('chatWrap').scrollTo({ top: 9999, behavior: 'smooth' });
+  return div;
+}
+
+function appendTyping() {
+  const inner = document.getElementById('chatInner');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.innerHTML = `<div class="msg-avatar">Ψ</div><div class="msg-body"><div class="msg-bubble"><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
+  inner.appendChild(div);
+  document.getElementById('chatWrap').scrollTo({ top: 9999, behavior: 'smooth' });
+  return div;
+}
+
+function formatMessage(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^### (.+)$/gm,'<h4>$1</h4>')
+    .replace(/^## (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^# (.+)$/gm,'<h3>$1</h3>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>(\n|$))+/g, m => '<ul>'+m+'</ul>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>')
+    .replace(/^(?!<[hup])/,'<p>').replace(/$(?<![>])/, '</p>');
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── API CALLS ──
+async function callClaude(userText) {
+  const messages = chatHistory.slice(-20).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+  messages[messages.length-1] = { role:'user', content: userText };
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKeys.claude,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      system: SYSTEM_PROMPT,
+      messages
+    })
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'Claude API hatası'); }
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+async function callOpenAI(userText) {
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...chatHistory.slice(-20).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
+    { role: 'user', content: userText }
+  ];
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKeys.openai },
+    body: JSON.stringify({ model: 'gpt-4o-mini', max_tokens: 1500, messages })
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'OpenAI API hatası'); }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+async function callGemini(userText) {
+  const contents = chatHistory.slice(-20).map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+  contents.push({ role: 'user', parts: [{ text: userText }] });
+
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeys.gemini}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents,
+      generationConfig: { maxOutputTokens: 1500 }
+    })
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'Gemini API hatası'); }
+  const data = await res.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+// ── DEMO RESPONSES ──
+async function demoResponse(text) {
+  await new Promise(r => setTimeout(r, 1400));
+  const t = text.toLowerCase();
+
+  if (t.includes('narsist') || t.includes('narsisist')) {
+    return `**Sam Vaknin ve Bessel van der Kolk'un perspektifinden:**\n\nNarsistik bir kişiyle ilişki, oldukça yorucu ve sağaltıcı olmayan bir döngü yaratır. Vaknin'in çalışmaları bize narsisizmin temelde **derin bir boşluk ve utanç duygusunun** üzerine inşa edilmiş bir savunma mekanizması olduğunu gösterir.\n\nBu ilişkide kendinizi genellikle şunlarla bulursunuz:\n- Sürekli "yanlış" hissetmek\n- Kendi gerçekliğinizden şüphe etmek (gaslighting)\n- Karşınızdakini "düzeltme" ya da "kurtarma" çabası\n\n**Van der Kolk ekler:** Beden bu döngüyü hatırlar. Kronik stres tepkisi, alarm sistemini sürekli açık tutar.\n\n*İlk adım:* Sınır çizmek değil, **önce kendinizin bu döngüdeki yerini anlamak.** Sizi bu ilişkiye çeken neydi? Bu soruyu derinlemesine incelemeye ne dersiniz? 🔍\n\n*(Demo mod — ${DEMO_LIMIT - demoUsed - 1} deneme hakkınız kaldı)*`;
+  }
+
+  if (t.includes('travma') || t.includes('çocukluk')) {
+    return `**Bessel van der Kolk ve Gabor Maté'nin ortak perspektifinden:**\n\n"Beden Skoru Tutar" — bu, Van der Kolk'un en temel argümanı. Çocuklukta yaşadığımız deneyimler sadece anılar olarak değil, **bedende fizyolojik izler** olarak da depolanır.\n\nGabor Maté ekler: Çocukluk stresi otoimmün yanıtları, bağımlılık eğilimlerini ve duygusal düzensizliği doğrudan şekillendirir. Bu bir "zayıflık" değil — hayatta kalma zekâsının ürünüdür.\n\nYetişkinlikte kendinizi şunlarda tanıyabilirsiniz:\n- **Tetikleyicilere orantısız tepkiler** (küçük bir olay büyük çöküş yaratıyor)\n- Güven kurmada güçlük\n- Bedensel semptomlar (ağrı, kas gerginliği, yorgunluk)\n- "Neden böyleyim?" sorusunun yanıtsız kalması\n\n*Freud burada şunu eklerdi:* Bilinçdışı, geçmişi tekrar sahneler — ta ki farkında olana kadar.\n\n*(Demo mod — ${DEMO_LIMIT - demoUsed - 1} deneme hakkınız kaldı)*`;
+  }
+
+  return `**15 Büyük Zihnin Bütünleşik Perspektifinden:**\n\nBu soruya birkaç katmandan bakabiliriz:\n\n**Freud & Jung:** Bilinçdışınızda bu duruma katkıda bulunan neler var? Hangi eski kalıplar bugün de aktif?\n\n**Beck (BDT):** Bu konuyla ilgili otomatik düşünceleriniz neler? "Bu her zaman böyle", "Benim suçum" gibi bilişsel çarpıtmalar var mı?\n\n**Rogers:** Şu an kendinize gösterdiğiniz empati nerede? Bir arkadaşınıza bu deneyimi yaşasaydı ne söylerdiniz?\n\n**Van der Kolk & Maté:** Beden bu durumda ne söylüyor? Gerginlik, kaçma isteği, donma var mı?\n\nDaha spesifik olabilirseniz — ilişki mi, kişisel bir zorluk mu, varoluşsal bir soru mu — çok daha derine inebiliriz.\n\n*(Bu bir demo yanıttır. Gerçek API bağlantısı için ayarlardan API anahtarınızı girin — ${DEMO_LIMIT - demoUsed - 1} deneme hakkınız kaldı.)*`;
+}
+
+// ── INIT ──
+// Load saved keys
+['claude','openai','gemini'].forEach(k => {
+  const saved = localStorage.getItem('psyche_key_' + k);
+  if (saved) apiKeys[k] = saved;
+});
+updateModelUI();
+</script>
+</body>
+</html>
